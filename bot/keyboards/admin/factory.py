@@ -38,3 +38,14 @@ class LoadoutCallback(CallbackData, prefix='loadout'):
 class MailingCallback(CallbackData, prefix='mailing'):
     action: str
 
+
+class CategoriesCallback(CallbackData, prefix='admin_categories'):
+    action: str
+    id: int
+    page: int
+
+
+class SubCategoriesCallback(CallbackData, prefix='admin_subcategories'):
+    action: str
+    id: int
+    page: int

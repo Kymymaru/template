@@ -5,9 +5,9 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.utils import funcs
-from bot.database import Settings, Mailing, Show, Subscription, Ref
+from bot.database import Settings, Mailing, Show, Subscription, Ref, Category
 from bot.keyboards.admin.factory import LoadoutCallback, MailingCallback, ReferralCallback, PaginationCallback, \
-    ShowsCallback, SubscriptionCallback
+    ShowsCallback, SubscriptionCallback, CategoriesCallback
 
 cancel = InlineKeyboardBuilder().button(
     text='Отмена', callback_data='cancel'
@@ -331,3 +331,81 @@ def subscription_keyboard(subscription: Subscription, data: SubscriptionCallback
         callback_data=data.pack()
     )
     return builder.adjust(2, 1).as_markup()
+
+
+def choose_categories_for_create_subcategory(categories: List[Category], page: int):
+    count_in_page = 7
+    builder = InlineKeyboardBuilder()
+    size = []
+    length = ceil(len(categories) / count_in_page) if count_in_page else 1
+    categories = categories[count_in_page * (page - 1):count_in_page * page]
+    for category in categories:
+        builder.button(
+            text=category.category,
+            callback_data=category.id
+        )
+        size.append(1)
+    builder = add_pagination(builder, length, from_pagination_to='categories_for_subcategory_creating', page=page)
+    size.append(3)
+    return builder.adjust(*size).as_markup()
+
+
+def categories_list(categories: List[Category], page: int):
+    count_in_page = 7
+    builder = InlineKeyboardBuilder()
+    size = []
+    length = ceil(len(categories) / count_in_page) if count_in_page else 1
+    categories = categories[count_in_page * (page - 1):count_in_page * page]
+    for category in categories:
+        data = CategoriesCallback(
+            action='info',
+            category_id=category.id,
+            page=page
+        )
+        builder.button(
+            text=category.category,
+            callback_data=data.pack()
+        )
+        size.append(1)
+    builder = add_pagination(builder, length, from_pagination_to='admin_categories_list', page=page)
+    size.append(3)
+    return builder.adjust(*size).as_markup()
+
+
+def category_and_subcategory_settings(data: CallbackData, data_for_back: str):
+    builder = InlineKeyboardBuilder()
+    data.action = 'del'
+    builder.button(
+        text='🗑',
+        callback_data=data.pack()
+    )
+    builder.button(
+        text='Назад 🔙',
+        callback_data=PaginationCallback(
+            into=data_for_back,
+            page=data.page
+        ).pack()
+    )
+    return builder.adjust(1).as_markup()
+
+
+def subcategories_list(categories: List[Category], page: int):
+    count_in_page = 7
+    builder = InlineKeyboardBuilder()
+    size = []
+    length = ceil(len(categories) / count_in_page) if count_in_page else 1
+    categories = categories[count_in_page * (page - 1):count_in_page * page]
+    for category in categories:
+        data = CategoriesCallback(
+            action='info',
+            category_id=category.id,
+            page=page
+        )
+        builder.button(
+            text=category.category,
+            callback_data=data.pack()
+        )
+        size.append(1)
+    builder = add_pagination(builder, length, from_pagination_to='admin_subcategories_list', page=page)
+    size.append(3)
+    return builder.adjust(*size).as_markup()

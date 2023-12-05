@@ -9,6 +9,8 @@ __all__ = [
     "Mailing",
     "Settings",
     "Show",
-    "Post",
-    "Ref"
+    "Ref",
+    "Category",
+    "SubCategory",
+    "Character",
 ]

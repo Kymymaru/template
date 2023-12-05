@@ -16,7 +16,7 @@ router = Router(name='loadout')
 
 
 @router.message(F.text == 'Выгрузка 🗳')
-async def loadout(message: types.Message, state: FSMContext):
+async def load_out(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text.main,
@@ -25,8 +25,8 @@ async def loadout(message: types.Message, state: FSMContext):
 
 
 @router.callback_query(LoadoutCallback.filter())
-async def loadout_call(call: types.CallbackQuery, callback_data: LoadoutCallback, state: FSMContext,
-                       session: AsyncSession):
+async def load_out_call(call: types.CallbackQuery, callback_data: LoadoutCallback, state: FSMContext,
+                        session: AsyncSession):
     data = callback_data
     await call.message.delete()
     if data.count == 'all':
@@ -35,7 +35,7 @@ async def loadout_call(call: types.CallbackQuery, callback_data: LoadoutCallback
         else:
             statement = select(Chat.chat_id).where(Chat.status == 1)
         message = await call.message.answer(text.request_processing)
-        await asyncio.create_task(do_loadout(message=message, session=session, statement=statement))
+        await asyncio.create_task(do_load_out(message=message, session=session, statement=statement))
     elif data.count == 'last':
         await state.update_data(type=data.type)
         await call.message.answer(text.get_count)
@@ -50,7 +50,7 @@ async def loadout_call(call: types.CallbackQuery, callback_data: LoadoutCallback
 
 
 @router.message(LoadoutState.get_count)
-async def loadout_state(message: types.Message, state: FSMContext, session: AsyncSession):
+async def load_out_state(message: types.Message, state: FSMContext, session: AsyncSession):
     count = message.text
     if count.isdigit():
         count = int(count)
@@ -62,12 +62,12 @@ async def loadout_state(message: types.Message, state: FSMContext, session: Asyn
         else:
             statement = select(Chat.chat_id).where(Chat.status == 1).order_by(Chat.id.desc()).limit(count)
         message = await message.answer(text.request_processing)
-        await asyncio.create_task(do_loadout(message=message, session=session, statement=statement))
+        await asyncio.create_task(do_load_out(message=message, session=session, statement=statement))
     else:
         await message.answer(text.type_a_integer)
 
 
-async def do_loadout(message: types.Message, session: AsyncSession, statement):
+async def do_load_out(message: types.Message, session: AsyncSession, statement):
     request = await session.execute(statement)
     user_ids = request.scalars().all()
     async with aiofiles.open('ids.txt', 'w') as f:

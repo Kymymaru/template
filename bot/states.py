@@ -24,3 +24,12 @@ class SubscriptionsState(StatesGroup):
 class RefState(StatesGroup):
     get_ref = State()
     get_price = State()
+
+
+class CategoryState(StatesGroup):
+    get_category_name = State()
+
+
+class SubCategoryState(StatesGroup):
+    get_subcategory_name = State()
+    get_category_id = State()
