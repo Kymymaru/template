@@ -1,7 +1,5 @@
 import datetime
-import json
 from typing import Any
-import requests
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -41,78 +39,6 @@ def get_times() -> tuple:
 async def get_count(session: AsyncSession, table: Any, *filt):
     r = await session.execute(select(func.count()).select_from(table).where(*filt))
     return r.scalar()
-
-
-def escape(text: str) -> str:
-    escape_dict = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '{': '&#123;',
-        '}': '&#125;',
-        "'": '&#8242;',
-        '"': '&#8243;',
-        '`': '&#96;',
-        '=': '&#61;',
-        '/': '&#47;',
-        '!': '&#33;',
-        '#': '&#35;',
-        '$': '&#36;',
-        '%': '&#37;',
-        '^': '&#94;',
-        '(': '&#40;',
-        ')': '&#41;',
-        '+': '&#43;',
-        '[': '&#91;',
-        ']': '&#93;',
-        '|': '&#124;',
-        '?': '&#63;',
-        ',': '&#44;',
-        '.': '&#46;',
-        ':': '&#58;',
-        ';': '&#59;',
-        '~': '&#126;',
-        '_': '&#95;',
-        '@': '&#64;',
-    }
-    return ''.join(escape_dict.get(char, char) for char in text)
-
-
-def unescape(text: str) -> str:
-    unescape_dict = {
-        '&amp;': '&',
-        '&lt;': '<',
-        '&gt;': '>',
-        '&#123;': '{',
-        '&#125;': '}',
-        '&#8242;': "'",
-        '&#8243;': '"',
-        '&#96;': '`',
-        '&#61;': '=',
-        '&#47;': '/',
-        '&#33;': '!',
-        '&#35;': '#',
-        '&#36;': '$',
-        '&#37;': '%',
-        '&#94;': '^',
-        '&#40;': '(',
-        '&#41;': ')',
-        '&#43;': '+',
-        '&#91;': '[',
-        '&#93;': ']',
-        '&#124;': '|',
-        '&#63;': '?',
-        '&#44;': ',',
-        '&#46;': '.',
-        '&#58;': ':',
-        '&#59;': ';',
-        '&#126;': '~',
-        '&#95;': '_',
-        '&#64;': '@',
-    }
-    for escape_seq, char in unescape_dict.items():
-        text = text.replace(escape_seq, char)
-    return text
 
 
 def splitting(number: int, offset: int = 3, symb: str = '.') -> str:

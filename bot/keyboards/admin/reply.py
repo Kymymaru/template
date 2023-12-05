@@ -11,11 +11,8 @@ def main_admin() -> ReplyKeyboardMarkup:
         text='Обяз. Подписка 🔐'
     )
     builder.button(
-        text='Категории'
+        text='Рассылка ✉️'
     )
-    # builder.button(
-    #     text='Рассылка ✉️'
-    # )
     # builder.button(
     #     text='Прибыль 💰'
     # )
@@ -25,9 +22,9 @@ def main_admin() -> ReplyKeyboardMarkup:
     builder.button(
         text='Выгрузка 🗳'
     )
-    # builder.button(
-    #     text='Показы 👀'
-    # )
+    builder.button(
+        text='Показы 👀'
+    )
     return builder.adjust(1, 3, 3).as_markup(
         resize_keyboard=True,
         input_field_placeholder='Добро пожаловать в админ панель 🏚'
@@ -59,27 +56,4 @@ def cancel():
     return builder.adjust(1, 3, 3).as_markup(
         resize_keyboard=True,
         input_field_placeholder='Меню рефералов 💵'
-    )
-
-
-def categories_menu():
-    builder = ReplyKeyboardBuilder()
-    builder.button(
-        text='Создать категорию ➕'
-    )
-    builder.button(
-        text='Список категорий 📖'
-    )
-    builder.button(
-        text='Создать подкатегорию ➕'
-    )
-    builder.button(
-        text='Создать подкатегорий 📖'
-    )
-    builder.button(
-        text='Вернутся в админ панель 🔙'
-    )
-    return builder.adjust(2, 2, 1).as_markup(
-        resize_keyboard=True,
-        input_field_placeholder='Меню категорий 📖'
     )

@@ -6,7 +6,78 @@ from sqlalchemy import Column, Integer, BigInteger, Text, String, Date, DateTime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import Base
-from ..utils import funcs
+
+
+def escape(text: str) -> str:
+    escape_dict = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '{': '&#123;',
+        '}': '&#125;',
+        "'": '&#8242;',
+        '"': '&#8243;',
+        '`': '&#96;',
+        '=': '&#61;',
+        '/': '&#47;',
+        '!': '&#33;',
+        '#': '&#35;',
+        '$': '&#36;',
+        '%': '&#37;',
+        '^': '&#94;',
+        '(': '&#40;',
+        ')': '&#41;',
+        '+': '&#43;',
+        '[': '&#91;',
+        ']': '&#93;',
+        '|': '&#124;',
+        '?': '&#63;',
+        ',': '&#44;',
+        '.': '&#46;',
+        ':': '&#58;',
+        ';': '&#59;',
+        '~': '&#126;',
+        '_': '&#95;',
+        '@': '&#64;',
+    }
+    return ''.join(escape_dict.get(char, char) for char in text)
+
+
+def unescape(text: str) -> str:
+    unescape_dict = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&#123;': '{',
+        '&#125;': '}',
+        '&#8242;': "'",
+        '&#8243;': '"',
+        '&#96;': '`',
+        '&#61;': '=',
+        '&#47;': '/',
+        '&#33;': '!',
+        '&#35;': '#',
+        '&#36;': '$',
+        '&#37;': '%',
+        '&#94;': '^',
+        '&#40;': '(',
+        '&#41;': ')',
+        '&#43;': '+',
+        '&#91;': '[',
+        '&#93;': ']',
+        '&#124;': '|',
+        '&#63;': '?',
+        '&#44;': ',',
+        '&#46;': '.',
+        '&#58;': ':',
+        '&#59;': ';',
+        '&#126;': '~',
+        '&#95;': '_',
+        '&#64;': '@',
+    }
+    for escape_seq, char in unescape_dict.items():
+        text = text.replace(escape_seq, char)
+    return text
 
 
 class User(Base):
@@ -38,7 +109,7 @@ class User(Base):
             user = User(
                 user_id=from_user.id,
                 ref=ref,
-                name=funcs.escape(from_user.first_name),
+                name=escape(from_user.first_name),
                 username=from_user.username,
                 lang_code=from_user.language_code if from_user.language_code is not None else 'ru',
                 status=status,
@@ -52,10 +123,10 @@ class User(Base):
             logger.info(
                 'New User: {}{}'.format(user.user_id, f'\tFrom Ref: {user.ref}' if user.ref is not None else ''))
         else:
-            user.name = funcs.escape(from_user.first_name)
+            user.name = escape(from_user.first_name)
             user.status = 1
             user.last_activity = datetime.datetime.now()
-        user.name = funcs.unescape(user.name)
+        user.name = unescape(user.name)
         return user
 
 
@@ -85,7 +156,7 @@ class Chat(Base):
         if chat is None:
             chat = Chat(
                 chat_id=from_chat.id,
-                title=funcs.escape(from_chat.title),
+                title=escape(from_chat.title),
                 ref=ref,
                 status=status,
                 reg_date=datetime.date.today(),
@@ -95,9 +166,9 @@ class Chat(Base):
             await session.merge(chat)
             logger.info(f'New Chat: {chat.chat_id}')
         else:
-            chat.title = funcs.escape(from_chat.title)
+            chat.title = escape(from_chat.title)
             chat.status = status
-        chat.title = funcs.unescape(chat.title)
+        chat.title = unescape(chat.title)
         return chat
 
 
@@ -170,29 +241,3 @@ class Ref(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     ref = Column(Text)
     price = Column(Integer, default=0)
-
-
-class Category(Base):
-    __tablename__ = 'categories'
-
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    category = Column(Text)
-
-
-class SubCategory(Base):
-    __tablename__ = 'subcategories'
-
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    category_id = Column(Integer)
-    subcategory = Column(Text)
-
-
-class Character(Base):
-    __tablename__ = 'characters'
-
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    fullname = Column(Text)
-    shortname = Column(Text)
-    description = Column(Text)
-    dialogue_example = Column(Text)
-    greeting = Column(Text)

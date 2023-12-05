@@ -1,13 +1,13 @@
 from math import ceil
-from typing import List, Tuple
+from typing import List
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from bot.utils import funcs
-from bot.database import Settings, Mailing, Show, Subscription, Ref, Category
+from bot.database import Settings, Mailing, Show, Subscription, Ref
 from bot.keyboards.admin.factory import LoadoutCallback, MailingCallback, ReferralCallback, PaginationCallback, \
-    ShowsCallback, SubscriptionCallback, CategoriesCallback
+    ShowsCallback, SubscriptionCallback
 
 cancel = InlineKeyboardBuilder().button(
     text='Отмена', callback_data='cancel'
@@ -204,52 +204,51 @@ def ref_buttons(data: ReferralCallback, graph: bool = True, back: bool = True) -
 def show_markups(shows: List[Show], page: int):
     count_in_page = 7
     builder = InlineKeyboardBuilder()
-    if shows is not None:
-        size = []
-        length = ceil(len(shows) / count_in_page) if count_in_page else 1
-        shows_in_page = shows[count_in_page * (page - 1):count_in_page * page]
-        for i, show in enumerate(shows_in_page, start=1 if page == 1 else (count_in_page * (page - 1) + 1)):
-            numerate_id = funcs.numerate(i)
-            data = ShowsCallback(
-                action='info',
-                id=show.id,
-                numerate_id=numerate_id,
-                page=str(page),
-                status=show.status
-            )
-            builder.button(
-                text=numerate_id,
-                callback_data=data.pack()
-            )
-            data.action = 'progress'
-            builder.button(
-                text=f'{show.sent} / {show.need_to_sent}',
-                callback_data=data.pack()
-            )
-            data.action = 'status'
-            builder.button(
-                text='Вкл 🟢' if show.status == 1 else 'Выкл 🔴',
-                callback_data=data.pack()
-            )
-            data.action = 'del'
-            builder.button(
-                text='🗑',
-                callback_data=data.pack()
-            )
-            size.append(4)
-        if page == length or length == 0:
-            data = ShowsCallback(
-                action='add',
-                id=1,
-                numerate_id='1',
-                page=str(page),
-                status='1'
-            )
-            builder.button(
-                text='➕',
-                callback_data=data.pack()
-            )
-            size.append(1)
+    size = []
+    length = ceil(len(shows) / count_in_page) if count_in_page else 1
+    shows_in_page = shows[count_in_page * (page - 1):count_in_page * page]
+    for i, show in enumerate(shows_in_page, start=1 if page == 1 else (count_in_page * (page - 1) + 1)):
+        numerate_id = funcs.numerate(i)
+        data = ShowsCallback(
+            action='info',
+            id=show.id,
+            numerate_id=numerate_id,
+            page=str(page),
+            status=show.status
+        )
+        builder.button(
+            text=numerate_id,
+            callback_data=data.pack()
+        )
+        data.action = 'progress'
+        builder.button(
+            text=f'{show.sent} / {show.need_to_sent}',
+            callback_data=data.pack()
+        )
+        data.action = 'status'
+        builder.button(
+            text='Вкл 🟢' if show.status == 1 else 'Выкл 🔴',
+            callback_data=data.pack()
+        )
+        data.action = 'del'
+        builder.button(
+            text='🗑',
+            callback_data=data.pack()
+        )
+        size.append(4)
+    if page == length or length == 0:
+        data = ShowsCallback(
+            action='add',
+            id=1,
+            numerate_id='1',
+            page=str(page),
+            status='1'
+        )
+        builder.button(
+            text='➕',
+            callback_data=data.pack()
+        )
+        size.append(1)
 
     builder = add_pagination(builder, length, from_pagination_to='shows', page=page)
     size.append(3)
@@ -260,53 +259,52 @@ def show_markups(shows: List[Show], page: int):
 def subscriptions_markup(subscriptions: List[Subscription], page: int):
     count_in_page = 7
     builder = InlineKeyboardBuilder()
-    if subscriptions is not None:
-        size = []
-        length = ceil(len(subscriptions) / count_in_page) if count_in_page else 1
-        subscriptions_in_page = subscriptions[count_in_page * (page - 1):count_in_page * page]
-        for i, subscription in enumerate(subscriptions_in_page,
-                                         start=1 if page == 1 else (count_in_page * (page - 1) + 1)):
-            numerate_id = funcs.numerate(i)
-            data = SubscriptionCallback(
-                action='info',
-                id=subscription.id,
-                numerate_id=numerate_id,
-                page=str(page),
-                status=subscription.status
-            )
-            builder.button(
-                text=numerate_id,
-                callback_data=data.pack()
-            )
-            data.action = 'small_info'
-            builder.button(
-                text=subscription.title,
-                callback_data=data.pack()
-            )
-            data.action = 'status'
-            builder.button(
-                text='Вкл 🟢' if subscription.status == 1 else 'Выкл 🔴',
-                callback_data=data.pack()
-            )
-            data.action = 'del'
-            builder.button(
-                text='🗑',
-                callback_data=data.pack()
-            )
-            size.append(4)
-        if page == length or length == 0:
-            data = SubscriptionCallback(
-                action='add',
-                id=1,
-                numerate_id='1',
-                page=str(page),
-                status='1'
-            )
-            builder.button(
-                text='➕',
-                callback_data=data.pack()
-            )
-            size.append(1)
+    size = []
+    length = ceil(len(subscriptions) / count_in_page) if count_in_page else 1
+    subscriptions_in_page = subscriptions[count_in_page * (page - 1):count_in_page * page]
+    for i, subscription in enumerate(subscriptions_in_page,
+                                     start=1 if page == 1 else (count_in_page * (page - 1) + 1)):
+        numerate_id = funcs.numerate(i)
+        data = SubscriptionCallback(
+            action='info',
+            id=subscription.id,
+            numerate_id=numerate_id,
+            page=str(page),
+            status=subscription.status
+        )
+        builder.button(
+            text=numerate_id,
+            callback_data=data.pack()
+        )
+        data.action = 'small_info'
+        builder.button(
+            text=subscription.title,
+            callback_data=data.pack()
+        )
+        data.action = 'status'
+        builder.button(
+            text='Вкл 🟢' if subscription.status == 1 else 'Выкл 🔴',
+            callback_data=data.pack()
+        )
+        data.action = 'del'
+        builder.button(
+            text='🗑',
+            callback_data=data.pack()
+        )
+        size.append(4)
+    if page == length or length == 0:
+        data = SubscriptionCallback(
+            action='add',
+            id=1,
+            numerate_id='1',
+            page=str(page),
+            status='1'
+        )
+        builder.button(
+            text='➕',
+            callback_data=data.pack()
+        )
+        size.append(1)
 
     builder = add_pagination(builder, length, from_pagination_to='subscriptions', page=page)
     size.append(3)
@@ -331,81 +329,3 @@ def subscription_keyboard(subscription: Subscription, data: SubscriptionCallback
         callback_data=data.pack()
     )
     return builder.adjust(2, 1).as_markup()
-
-
-def choose_categories_for_create_subcategory(categories: List[Category], page: int):
-    count_in_page = 7
-    builder = InlineKeyboardBuilder()
-    size = []
-    length = ceil(len(categories) / count_in_page) if count_in_page else 1
-    categories = categories[count_in_page * (page - 1):count_in_page * page]
-    for category in categories:
-        builder.button(
-            text=category.category,
-            callback_data=category.id
-        )
-        size.append(1)
-    builder = add_pagination(builder, length, from_pagination_to='categories_for_subcategory_creating', page=page)
-    size.append(3)
-    return builder.adjust(*size).as_markup()
-
-
-def categories_list(categories: List[Category], page: int):
-    count_in_page = 7
-    builder = InlineKeyboardBuilder()
-    size = []
-    length = ceil(len(categories) / count_in_page) if count_in_page else 1
-    categories = categories[count_in_page * (page - 1):count_in_page * page]
-    for category in categories:
-        data = CategoriesCallback(
-            action='info',
-            category_id=category.id,
-            page=page
-        )
-        builder.button(
-            text=category.category,
-            callback_data=data.pack()
-        )
-        size.append(1)
-    builder = add_pagination(builder, length, from_pagination_to='admin_categories_list', page=page)
-    size.append(3)
-    return builder.adjust(*size).as_markup()
-
-
-def category_and_subcategory_settings(data: CallbackData, data_for_back: str):
-    builder = InlineKeyboardBuilder()
-    data.action = 'del'
-    builder.button(
-        text='🗑',
-        callback_data=data.pack()
-    )
-    builder.button(
-        text='Назад 🔙',
-        callback_data=PaginationCallback(
-            into=data_for_back,
-            page=data.page
-        ).pack()
-    )
-    return builder.adjust(1).as_markup()
-
-
-def subcategories_list(categories: List[Category], page: int):
-    count_in_page = 7
-    builder = InlineKeyboardBuilder()
-    size = []
-    length = ceil(len(categories) / count_in_page) if count_in_page else 1
-    categories = categories[count_in_page * (page - 1):count_in_page * page]
-    for category in categories:
-        data = CategoriesCallback(
-            action='info',
-            category_id=category.id,
-            page=page
-        )
-        builder.button(
-            text=category.category,
-            callback_data=data.pack()
-        )
-        size.append(1)
-    builder = add_pagination(builder, length, from_pagination_to='admin_subcategories_list', page=page)
-    size.append(3)
-    return builder.adjust(*size).as_markup()

@@ -10,7 +10,4 @@ __all__ = [
     "Settings",
     "Show",
     "Ref",
-    "Category",
-    "SubCategory",
-    "Character",
 ]

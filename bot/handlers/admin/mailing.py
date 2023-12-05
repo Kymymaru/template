@@ -3,6 +3,7 @@ import random
 
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
+from loguru import logger
 
 from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -117,7 +118,7 @@ async def mailing_callback_commands(
                 reply_markup=settings.keyboard
             )
         except Exception as err:
-            await call.message.edit_text(text.error.format(funcs.escape(str(err))))
+            logger.error(err)
     elif data.action == 'count':
         message_id = (await call.message.edit_text(
             text.send_count_people,

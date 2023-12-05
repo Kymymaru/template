@@ -21,8 +21,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from bot.config import config
 from bot.handlers import admin, user, group
-from bot.middlewares import RegistrationMiddleware, ThrottlingMiddleware, LoggingMiddleware, \
-    BlocksMiddleware, DatabaseInstance
+from bot.middlewares import ThrottlingMiddleware, LoggingMiddleware, DatabaseInstance
 from bot.database import Base
 from bot.ui_commands import set_bot_commands
 
@@ -82,7 +81,6 @@ def main():
     group.reg_routers(dp)
 
     dp.update.middleware(DatabaseInstance(session_pool=session_maker))
-    dp.update.middleware(RegistrationMiddleware())
     dp.message.middleware(ThrottlingMiddleware(throttle_time=config.bot.throttling_time))
     if config.bot.logging:
         dp.update.middleware(LoggingMiddleware())
