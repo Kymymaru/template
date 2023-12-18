@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.database import Subscription
+from bot.database import Subscription, User
 from bot.texts.user import subscription as text
 from bot.keyboards.user import inline
 
@@ -50,6 +50,9 @@ class SubscriptionMiddleware(BaseMiddleware):
         chat_type = event.chat.type if isinstance(event, types.Message) else event.message.chat.type
         session: AsyncSession = data['session']
         if chat_type == 'private':
+            if isinstance(event, types.Message) and event.text is not None and event.text.startswith('/start'):
+                if len(event.text.split()) == 2:
+                    await User.process_user(session, event.from_user, event.bot, ref=event.text.split()[1])
             subscriptions: List[Subscription] = (await session.execute(
                 select(Subscription).where(Subscription.status == 1))
                                                  ).scalars().all()
