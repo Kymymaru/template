@@ -82,6 +82,11 @@ async def stats_markup(message: types.Message, state: FSMContext, session: Async
         Chat,
         Chat.status == 1
     )
+    has_admin_chats = await funcs.get_count(
+        session,
+        Chat,
+        Chat.has_admin_rights == 1
+    )
     timed_stats_chat = [
         await funcs.get_count(
             session,
@@ -105,6 +110,8 @@ async def stats_markup(message: types.Message, state: FSMContext, session: Async
 
         total_chats,
         active_chats, funcs.get_percent(total_chats, active_chats),
+        has_admin_chats, funcs.get_percent(total_chats, has_admin_chats),
+        total_chats - has_admin_chats, funcs.get_percent(total_chats, total_chats - has_admin_chats),
         (total_chats - active_chats), funcs.get_percent(total_chats, (total_chats - active_chats)),
 
         *timed_stats_chat

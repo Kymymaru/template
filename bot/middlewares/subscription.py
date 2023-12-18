@@ -52,7 +52,7 @@ class SubscriptionMiddleware(BaseMiddleware):
         if chat_type == 'private':
             if isinstance(event, types.Message) and event.text is not None and event.text.startswith('/start'):
                 if len(event.text.split()) == 2:
-                    await User.process_user(session, event.from_user, event.bot, ref=event.text.split()[1])
+                    await User.process_user(session, event.from_user, 1, ref=event.text.split()[1])
             subscriptions: List[Subscription] = (await session.execute(
                 select(Subscription).where(Subscription.status == 1))
                                                  ).scalars().all()
