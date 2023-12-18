@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.database import User, Chat, Subscription
 
-from bot.texts import total as text
+from bot.texts.admin import statistic as text
 from bot.utils import funcs, statistic
 
 router = Router(name='stats')
@@ -52,6 +52,8 @@ async def stats_markup(message: types.Message, state: FSMContext, session: Async
     result = (await session.execute(
         select(User.lang_code).group_by(User.lang_code).order_by(func.count().desc()).limit(4))
               ).scalars().all()
+
+    last_i = 0
     for i, item in enumerate(result, start=1):
         count = await funcs.get_count(
             session,
@@ -61,13 +63,13 @@ async def stats_markup(message: types.Message, state: FSMContext, session: Async
         langs += f'{i}. {item.upper()}    ' \
                  f'<code>{count}</code>    ' \
                  f'<code>({funcs.get_percent(total_users, count)}%)</code>\n'
-
+        last_i += 1
     other_count = await funcs.get_count(
         session,
         User,
         User.lang_code.notin_(result)
     )
-    langs += f'{i + 1}. Остальные    ' \
+    langs += f'{last_i + 1}. Остальные    ' \
              f'<code>{other_count}</code>    ' \
              f'<code>({funcs.get_percent(total_users, other_count)}%)</code>\n'
 

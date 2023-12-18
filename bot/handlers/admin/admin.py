@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.keyboards.admin import reply
-from bot.texts import total as text
+from bot.texts.admin import admin as text
 from bot.database import Database
 
 router = Router(name='admin_command')
