@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, CommandObject
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.texts import total as text
+from bot.texts.user import start as text
 from bot.database import Database
 
 router = Router(name='start_command')
