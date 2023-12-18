@@ -64,7 +64,6 @@ class SubscriptionMiddleware(BaseMiddleware):
                 else:
                     if not await process(event, i, session):
                         dont_subbed.append(i)
-            await session.commit()
             if len(dont_subbed) == 0:
                 return await handler(event, data)
             else:

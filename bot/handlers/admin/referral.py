@@ -43,7 +43,6 @@ async def get_ref(message: types.Message, state: FSMContext, session: AsyncSessi
             ref=message.text
         )
     )
-    await session.commit()
     await state.clear()
     await message.answer(
         text=text.create_ref_successful.format(ref=message.text),
@@ -70,7 +69,6 @@ async def set_price_command(message: types.Message, command: CommandObject, sess
                         price=price
                     )
                 )
-                await session.commit()
 
                 if callback_data.type == 'user':
                     data = await get_data(session, User, callback_data, config.bot.username)
@@ -179,7 +177,6 @@ async def refs_callbacks(call: types.CallbackQuery, state: FSMContext, callback_
         await session.execute(
             delete(Ref).where(Ref.ref == callback_data.ref)
         )
-        await session.commit()
         await call.answer(text.successful_delete.format(callback_data.ref))
         await call.message.delete()
         await refs_list(call.message, state, session, callback_data.page)

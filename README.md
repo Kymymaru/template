@@ -15,10 +15,10 @@
 Перед установкой бота нужно будет установить [MysqlServer](https://dev.mysql.com/downloads/mysql/) и [RedisServer](https://github.com/tporadowski/redis/releases)
 
 ```
-git clone https://github.com/Kymymaru/aiogram3_template.git
+git clone https://github.com/Kymymaru/template.git
 python -m venv bot_venv
 bot_venv\Scripts\activate
-cd aiogram3_template
+cd template
 pip install -r requirements.txt
 python -m bot
 ```
@@ -26,10 +26,10 @@ python -m bot
 ## Установка на Linux (Debian system)
 ```
 apt install mysql-server redis-server python3-pip python3.10-venv
-git clone https://github.com/Kymymaru/aiogram3_template.git
+git clone https://github.com/Kymymaru/template.git
 python3 -m venv bot_venv
 source bot_venv\Scripts\activate
-cd aiogram3_template
+cd emplate
 pip3 install -r requirements.txt
 python3 -m bot
 ```

@@ -17,24 +17,20 @@ from aiogram.webhook.aiohttp_server import (
 )
 
 from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from bot.config import config
 from bot.handlers import admin, user, group
 from bot.middlewares import ThrottlingMiddleware, LoggingMiddleware, DatabaseInstance
-from bot.database import Base
+from bot.database import Database
 from bot.ui_commands import set_bot_commands
 
 
-async def on_startup(bot: Bot, engine):
+async def on_startup(bot: Bot, database: Database):
     if config.bot.skip_updates:
         await bot.delete_webhook(drop_pending_updates=True)
     if not config.bot.polling:
         await bot.set_webhook(f"{config.bot.BASE_URL}{config.bot.MAIN_BOT_PATH}")
-    async with engine.begin() as conn:
-        if config.database.debug:
-            await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+    await database.create_tables()
     bot_object = await bot.get_me()
     config.bot.username = bot_object.username
     await set_bot_commands(bot, config.bot.admins)
@@ -49,20 +45,12 @@ def main():
     '''
     logger.info(f"Attempting Bot Startup")
 
-    engine = create_async_engine(
-        url='mysql+aiomysql://'
-            f'{config.database.user}:'
-            f'{config.database.password}@'
-            f'{config.database.host}/'
-            f'{config.database.database}',
-        echo=False, pool_size=20, max_overflow=10
-    )
-    session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    database = Database(config.database)
 
     logger.info("Database Engine Created")
 
     session = AiohttpSession()
-    bot_settings = {"session": session, "parse_mode": ParseMode.HTML}
+    bot_settings = {"session": session, "parse_mode": ParseMode.HTML, 'disable_web_page_preview': True}
     bot = Bot(token=config.bot.token, **bot_settings)
     if config.bot.use_redis:
         storage = RedisStorage(
@@ -74,19 +62,19 @@ def main():
     else:
         storage = MemoryStorage()
 
-    dp = Dispatcher(storage=storage, config=config)
+    dp = Dispatcher(storage=storage, config=config, database=database)
 
     admin.reg_routers(dp)
     user.reg_routers(dp)
     group.reg_routers(dp)
 
-    dp.update.middleware(DatabaseInstance(session_pool=session_maker))
+    dp.update.middleware(DatabaseInstance())
     dp.message.middleware(ThrottlingMiddleware(throttle_time=config.bot.throttling_time))
     if config.bot.logging:
         dp.update.middleware(LoggingMiddleware())
     dp.callback_query.middleware(CallbackAnswerMiddleware())
 
-    startup = partial(on_startup, engine=engine)
+    startup = partial(on_startup, database=database)
     dp.startup.register(startup)
 
     if config.bot.polling:

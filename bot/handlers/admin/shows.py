@@ -49,7 +49,6 @@ async def shows_callbacks(call: types.CallbackQuery, callback_data: ShowsCallbac
         if bool(data.status):
             info = f'Показ {data.numerate_id} включен ✅'
         await session.execute(update(Show).where(Show.id == data.id).values(status=data.status))
-        await session.commit()
         await call.answer(info)
         await main(call.message, state, session, page=data.page, edit=True)
     elif data.action == 'progress':
@@ -65,7 +64,6 @@ async def shows_callbacks(call: types.CallbackQuery, callback_data: ShowsCallbac
         )
     elif data.action == 'delete':
         await session.execute(delete(Show).where(Show.id == data.id))
-        await session.commit()
         await call.answer(text.delete.format(data.numerate_id))
         await main(call.message, state, session, page=data.page, edit=True)
 
@@ -147,7 +145,6 @@ async def get_sent_count_state(message: types.Message, state: FSMContext, sessio
                 need_to_sent=need_sent
             )
         )
-        await session.commit()
         await message.answer(text.success_add, reply_markup=reply.main_admin())
         await main(message, state, session)
     else:

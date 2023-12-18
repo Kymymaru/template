@@ -228,7 +228,6 @@ async def get_mailing_post(message: types.Message, state: FSMContext, session: A
             chat_id=message.from_user.id, message_id=message.message_id,
             keyboard=keyboard)
         )
-    await session.commit()
     return await main_mailing_menu(message, state, session, config)
 
 
@@ -239,7 +238,6 @@ async def get_count_call(call: types.CallbackQuery, state: FSMContext, session: 
         await session.merge(Settings(order=1, count=0))
     else:
         await session.execute(update(Settings).where(Settings.id == settings.id).values(count=0))
-    await session.commit()
     return await main_mailing_menu(call.message, state, session, config, edit=True)
 
 
@@ -261,7 +259,6 @@ async def get_count_message(message: types.Message, state: FSMContext, session: 
             await session.merge(Settings(order=1, count=count))
         else:
             await session.execute(update(Settings).where(Settings.id == settings.id).values(count=count))
-        await session.commit()
         return await main_mailing_menu(message, state, session, config)
     else:
         await message.answer('Введите число!')
@@ -275,5 +272,4 @@ async def get_order(call: types.CallbackQuery, state: FSMContext, session: Async
         await session.merge(Settings(order=order, count=0))
     else:
         await session.execute(update(Settings).where(Settings.id == settings.id).values(order=order))
-    await session.commit()
     return await main_mailing_menu(call.message, state, session, config, edit=True)

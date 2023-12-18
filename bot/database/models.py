@@ -117,11 +117,10 @@ class User(Base):
                 death_date=None,
                 last_activity=datetime.datetime.now(),
             )
-            await session.merge(
-                user
-            )
+            session.add(user)
             logger.info(
-                'New User: {}{}'.format(user.user_id, f'\tFrom Ref: {user.ref}' if user.ref is not None else ''))
+                'New User: {}{}'.format(user.user_id, f'\tFrom Ref: {user.ref}' if user.ref is not None else '')
+            )
         else:
             user.name = escape(from_user.first_name)
             user.status = 1
@@ -138,6 +137,7 @@ class Chat(Base):
     title = Column(Text)
     ref = Column(Text)
     status = Column(Integer)
+    has_admin_rights = Column(Integer)
     reg_date = Column(Date)
     death_date = Column(Date)
     data = Column(JSON, default={})
@@ -147,6 +147,7 @@ class Chat(Base):
             session: AsyncSession,
             from_chat: types.Chat,
             status: int = 1,
+            has_admin_rights: int = 0,
             ref: str = None,
     ):
         request = await session.execute(
@@ -159,15 +160,19 @@ class Chat(Base):
                 title=escape(from_chat.title),
                 ref=ref,
                 status=status,
+                has_admin_rights=has_admin_rights,
                 reg_date=datetime.date.today(),
                 death_date=None,
                 data={}
             )
-            await session.merge(chat)
-            logger.info(f'New Chat: {chat.chat_id}')
+            session.add(chat)
+            logger.info(
+                'New Chat: {}{}'.format(chat.chat_id, f'\tFrom Ref: {chat.ref}' if chat.ref is not None else '')
+            )
         else:
             chat.title = escape(from_chat.title)
             chat.status = status
+            chat.has_admin_rights = has_admin_rights
         chat.title = unescape(chat.title)
         return chat
 

@@ -55,7 +55,6 @@ async def subscriptions_callbacks(call: types.CallbackQuery, callback_data: Subs
         if bool(data.status):
             info = f'Канал/Бот {data.numerate_id} добавлен в список обяз. подписки ✅'
         await session.execute(update(Subscription).where(Subscription.id == data.id).values(status=data.status))
-        await session.commit()
         await call.answer(info)
         if '_' in data.action:
             return await go_to_subscription(call, data, session)
@@ -67,7 +66,6 @@ async def subscriptions_callbacks(call: types.CallbackQuery, callback_data: Subs
         )
     elif data.action == 'delete':
         await session.execute(delete(Subscription).where(Subscription.id == data.id))
-        await session.commit()
         await call.answer(text.delete.format(data.numerate_id))
         await main(call.message, state, session, page=data.page, edit=True)
 
@@ -133,7 +131,6 @@ async def get_sent_count_state(message: types.Message, state: FSMContext, sessio
             is_bot=data['is_bot'],
             link=link,
         ))
-        await session.commit()
         await message.answer(text.success_add, reply_markup=reply.main_admin())
         await main(message, state, session)
     else:
